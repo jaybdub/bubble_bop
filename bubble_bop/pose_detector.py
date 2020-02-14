@@ -77,7 +77,6 @@ TOPOLOGY = trt_pose.coco.coco_category_to_topology(COCO_CATEGORY)
 class PoseDetector(object):
     
     def __init__(self,
-                 model_path='pose_model_trt.pth',
                  torch_model='resnet18_baseline_att',
                  input_shape=(224, 224),
                  dtype=torch.float32,
@@ -90,10 +89,11 @@ class PoseDetector(object):
         self.mean = torch.Tensor([0.485, 0.456, 0.406]).to(device).type(dtype)
         self.std = torch.Tensor([0.229, 0.224, 0.225]).to(device).type(dtype)
         
+        model_path = torch_model + '_trt.pth'
         if not os.path.exists(model_path):
             
             # download model
-            download_path = 'pose_model_torch.pth'
+            download_path = torch_model + '_torch.pth'
             subprocess.call(['wget', MODEL_URLS[torch_model], '-O', download_path])
             
             # load downloaded model
