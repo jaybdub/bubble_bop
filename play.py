@@ -127,8 +127,5 @@ while True:
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-    print(bubble_speed)
     
 cv2.destroyAllWindows()
-
-print('FINAL SCORE: %d' % score)
