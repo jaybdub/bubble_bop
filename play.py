@@ -70,7 +70,6 @@ image = np.copy(camera.read()[:, ::-1])
 # RUN
 while True:
     
-    
     # DISPLAY FINAL SCORE IF FINISHED
     while bubble_radius > MAX_BUBBLE_RADIUS:
         
@@ -119,7 +118,10 @@ while True:
     bubble_radius += bubble_speed 
         
     # write score
-    neck = to_pixels(person['neck'], IMAGE_SHAPE)
+    if 'neck' in person:
+        neck = to_pixels(person['neck'], IMAGE_SHAPE)
+    else:
+        neck = (0, 0)
     image = cv2.putText(image, '%d' % score, (neck[0]-20, neck[1]), TEXT_FONT,  
                    TEXT_FONT_SCALE, TEXT_COLOR, TEXT_THICKNESS, cv2.LINE_AA)
         
