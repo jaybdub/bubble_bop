@@ -10,7 +10,7 @@ from bubble_bop.circle_sampler import CircleSampler
 
 
 # PARAMETERS
-CAPTURE_DEVICE = 1
+CAPTURE_DEVICE = 0
 IMAGE_SHAPE = (640, 480)
 MIN_BUBBLE_RADIUS = 1
 MAX_BUBBLE_RADIUS = 65
