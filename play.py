@@ -14,7 +14,8 @@ CAPTURE_DEVICE = 1
 IMAGE_SHAPE = (640, 480)
 MIN_BUBBLE_RADIUS = 1
 MAX_BUBBLE_RADIUS = 65
-BUBBLE_RADIUS_GROWTH_RATE = 1
+MIN_BUBBLE_SPEED = 1.0  # pix/frame
+BUBBLE_SPEED_GROWTH = 0.02
 BUBBLE_THICKNESS = 2
 LEFT_SAMPLE_AREA_CENTER = (180, 200)
 RIGHT_SAMPLE_AREA_CENTER = (640 - 180, 200)
@@ -31,7 +32,7 @@ POSE_MODEL = 'densenet121_baseline_att'
 POSE_INPUT_SHAPE = (256, 256)
 
 TEXT_FONT = cv2.FONT_HERSHEY_SIMPLEX
-TEXT_FONT_SCALE = 1
+TEXT_FONT_SCALE = 0.5
 TEXT_COLOR = (0, 255, 0)
 TEXT_THICKNESS = 2
 TEXT_ORIGIN = (50, 50)
@@ -62,27 +63,29 @@ right_bubble = to_int(right_sampler.sample())
 left_wrist = (0, 0)
 right_wrist = (0, 0)
 bubble_radius = MIN_BUBBLE_RADIUS
+bubble_speed = MIN_BUBBLE_SPEED
 score = 0
 image = np.copy(camera.read()[:, ::-1])
 
 # RUN
 while True:
     
-    image = np.copy(camera.read()[:, ::-1])
     
     # DISPLAY FINAL SCORE IF FINISHED
     while bubble_radius > MAX_BUBBLE_RADIUS:
         
-        image = cv2.putText(image, 'SCORE: %d (FINAL)' % score, TEXT_ORIGIN, TEXT_FONT,  
-                   TEXT_FONT_SCALE, TEXT_COLOR, TEXT_THICKNESS, cv2.LINE_AA)
+#         image = cv2.putText(image, 'SCORE: %d (FINAL)' % score, TEXT_ORIGIN, TEXT_FONT,  
+#                    TEXT_FONT_SCALE, TEXT_COLOR, TEXT_THICKNESS, cv2.LINE_AA)
         
         cv2.imshow('BubbleBop', image)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             score = 0
             bubble_radius = MIN_BUBBLE_RADIUS
+            bubble_speed = MIN_BUBBLE_SPEED
             break
             
+    image = np.copy(camera.read()[:, ::-1])
     people = pose_detector(image)
     
     if len(people) > 0:
@@ -101,27 +104,30 @@ while True:
     cv2.circle(image, right_wrist, WRIST_RADIUS, RIGHT_COLOR, -1)
     
     # render bubbles
-    cv2.circle(image, left_bubble, bubble_radius, LEFT_COLOR, 3)
-    cv2.circle(image, right_bubble, bubble_radius, RIGHT_COLOR, 3)
+    cv2.circle(image, left_bubble, int(bubble_radius), LEFT_COLOR, 3)
+    cv2.circle(image, right_bubble, int(bubble_radius), RIGHT_COLOR, 3)
         
     # check bubble match
     if distance(left_bubble, left_wrist) < bubble_radius and distance(right_bubble, right_wrist) < bubble_radius:
         left_bubble = to_int(left_sampler.sample())
         right_bubble = to_int(right_sampler.sample())
-        score += MAX_BUBBLE_RADIUS - bubble_radius
+        score += 1
         bubble_radius = MIN_BUBBLE_RADIUS
+        bubble_speed += BUBBLE_SPEED_GROWTH
        
     # increment bubble radius
-    bubble_radius += BUBBLE_RADIUS_GROWTH_RATE
+    bubble_radius += bubble_speed 
         
     # write score
-    image = cv2.putText(image, 'SCORE: %d' % score, TEXT_ORIGIN, TEXT_FONT,  
+    neck = to_pixels(person['neck'], IMAGE_SHAPE)
+    image = cv2.putText(image, '%d' % score, (neck[0]-20, neck[1]), TEXT_FONT,  
                    TEXT_FONT_SCALE, TEXT_COLOR, TEXT_THICKNESS, cv2.LINE_AA)
         
     cv2.imshow('BubbleBop', image)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+    print(bubble_speed)
     
 cv2.destroyAllWindows()
 
