@@ -7,12 +7,6 @@ BubbleBop is a simple game for NVIDIA Jetson Nano.
 1. Install torch2trt, etc.
 2. Plug Jetson into monitor
 
-## Run
-
-```python
-python3 play.p
-```
-
 ## Play!
 
 Bop the bubbles!
