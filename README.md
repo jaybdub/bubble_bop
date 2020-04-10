@@ -1,6 +1,6 @@
 # BubbleBop
 
-BubbleBop is a simple game for NVIDIA Jetson.
+BubbleBop is a simple game for NVIDIA Jetson.  Use your body to bop the bubbles before they get too big.
 
 ## Setup
 
